@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+export BUILD_TYPE=Debug
+export TOOLCHAIN=/home/daniel/Tools/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin
+export TOOLCHAIN_PATH=${TOOLCHAIN}
+export TOOLCHAIN_PREFIX=aarch64-linux-gnu
+export CUDA_TOOLKIT_ROOT_DIR=/home/daniel/Development/Distr/nvidia/usr/local/cuda-10.0
+
+
+colcon build \
+  --symlink-install \
+  --cmake-force-configure \
+  --event-handlers console_direct+ \
+    --cmake-args \
+    --no-warn-unused-cli \
+    -DCMAKE_TOOLCHAIN_FILE=`pwd`/aarch64_toolchainfile.cmake \
+    -DTHIRDPARTY=ON \
+    -DBUILD_TESTING:BOOL=OFF \
+    -DCMAKE_BUILD_RPATH="`pwd`/build/poco_vendor/poco_external_project_install/lib/;`pwd`/build/libyaml_vendor/libyaml_install/lib/"
+
+#  --packages-select qt_gui_cpp \
+#  --packages-select rviz_ogre_vendor \
+#  --packages-select qt_gui_cpp rcl_interfaces \
+#  --event-handlers console_direct+ \
+#  --packages-select rclcpp_components \
+#  --parallel-workers 1 \
+#  --packages-skip rclcpp_components examples_rclcpp_minimal_client tlsf_cpp examples_rclcpp_minimal_publisher \
+

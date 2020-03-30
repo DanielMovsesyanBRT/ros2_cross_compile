@@ -1,0 +1,90 @@
+diff --git src/ros2/tinyxml_vendor/CMakeLists.txt src/ros2/tinyxml_vendor/CMakeLists.txt
+index ad4930b..8f2d561 100644
+--- src/ros2/tinyxml_vendor/CMakeLists.txt
++++ src/ros2/tinyxml_vendor/CMakeLists.txt
+@@ -10,12 +10,12 @@ if(NOT FORCE_BUILD_VENDOR_PKG)
+   find_package(TinyXML)
+ endif()
+ 
+-
+ if (NOT TinyXML_FOUND)
+   include(ExternalProject)
+   ExternalProject_Add(tinyxml-2.6.2
+     PREFIX tinyxml-2.6.2
+-    URL https://superb-dca2.dl.sourceforge.net/project/tinyxml/tinyxml/2.6.2/tinyxml_2_6_2.tar.gz
++    #    URL https://superb-dca2.dl.sourceforge.net/project/tinyxml/tinyxml/2.6.2/tinyxml_2_6_2.tar.gz
++    URL ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml_2_6_2.tar.gz
+     URL_MD5 c1b864c96804a10526540c664ade67f0
+     CMAKE_ARGS
+       -DBUILD_SHARED_LIBS=ON
+diff --git src/ros2/rmw_cyclonedds/rmw_cyclonedds_cpp/src/rmw_node.cpp src/ros2/rmw_cyclonedds/rmw_cyclonedds_cpp/src/rmw_node.cpp
+index 7f33a4a..0fdd8dd 100644
+--- src/ros2/rmw_cyclonedds/rmw_cyclonedds_cpp/src/rmw_node.cpp
++++ src/ros2/rmw_cyclonedds/rmw_cyclonedds_cpp/src/rmw_node.cpp
+@@ -37,7 +37,7 @@
+ #include "rmw/get_node_info_and_types.h"
+ #include "rmw/get_service_names_and_types.h"
+ #include "rmw/get_topic_names_and_types.h"
+-#include "rmw/incompatible_qos_events_statuses.h"
++// #include "rmw/incompatible_qos_events_statuses.h"
+ #include "rmw/names_and_types.h"
+ #include "rmw/rmw.h"
+ #include "rmw/sanity_checks.h"
+diff --git src/ros2/rviz/rviz_assimp_vendor/CMakeLists.txt src/ros2/rviz/rviz_assimp_vendor/CMakeLists.txt
+index be53bee3..785e00a7 100644
+--- src/ros2/rviz/rviz_assimp_vendor/CMakeLists.txt
++++ src/ros2/rviz/rviz_assimp_vendor/CMakeLists.txt
+@@ -30,6 +30,13 @@ macro(build_assimp)
+     set(should_log OFF)
+   endif()
+ 
++  if(DEFINED CMAKE_TOOLCHAIN_FILE)
++    list(APPEND extra_cmake_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
++  else()
++    list(APPEND extra_cmake_args "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
++    list(APPEND extra_cmake_args "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
++  endif()
++
+   include(ExternalProject)
+   ExternalProject_Add(assimp-4.1.0
+     URL https://github.com/assimp/assimp/archive/v4.1.0.tar.gz
+diff --git src/ros-visualization/python_qt_binding/cmake/sip_configure.py src/ros-visualization/python_qt_binding/cmake/sip_configure.py
+index 4f8c6c4..0aca307 100644
+--- src/ros-visualization/python_qt_binding/cmake/sip_configure.py
++++ src/ros-visualization/python_qt_binding/cmake/sip_configure.py
+@@ -36,6 +36,15 @@ class Configuration(sipconfig.Configuration):
+         macros['INCDIR_QT'] = qtconfig['QT_INSTALL_HEADERS']
+         macros['LIBDIR_QT'] = qtconfig['QT_INSTALL_LIBS']
+         macros['MOC'] = 'moc-qt5'
++
++        if 'CC' in env:
++            macros['CC'] = env['CC']
++        if 'CXX' in env:
++            macros['CXX'] = env['CXX']
++        if 'LINK' in env:
++            macros['LINK'] = env['LINK']
++            macros['LINK_SHLIB'] = env['LINK']
++
+         self.set_build_macros(macros)
+ 
+ 
+diff --git src/ros-visualization/python_qt_binding/cmake/sip_helper.cmake src/ros-visualization/python_qt_binding/cmake/sip_helper.cmake
+index 4debd5e..6250ccc 100644
+--- src/ros-visualization/python_qt_binding/cmake/sip_helper.cmake
++++ src/ros-visualization/python_qt_binding/cmake/sip_helper.cmake
+@@ -81,7 +81,7 @@ function(build_sip_binding PROJECT_NAME SIP_FILE)
+ 
+     add_custom_command(
+         OUTPUT ${SIP_BUILD_DIR}/Makefile
+-        COMMAND ${PYTHON_EXECUTABLE} ${sip_SIP_CONFIGURE} ${SIP_BUILD_DIR} ${SIP_FILE} ${sip_LIBRARY_DIR} \"${INCLUDE_DIRS}\" \"${LIBRARIES}\" \"${LIBRARY_DIRS}\" \"${LDFLAGS_OTHER}\"
++        COMMAND export CC=${CMAKE_C_COMPILER} && export CXX=${CMAKE_CXX_COMPILER} && export LINK=${CMAKE_CXX_COMPILER} && ${PYTHON_EXECUTABLE} ${sip_SIP_CONFIGURE} ${SIP_BUILD_DIR} ${SIP_FILE} ${sip_LIBRARY_DIR} \"${INCLUDE_DIRS}\" \"${LIBRARIES}\" \"${LIBRARY_DIRS}\" \"${LDFLAGS_OTHER}\"
+         DEPENDS ${sip_SIP_CONFIGURE} ${SIP_FILE} ${sip_DEPENDS}
+         WORKING_DIRECTORY ${sip_SOURCE_DIR}
+         COMMENT "Running SIP generator for ${PROJECT_NAME} Python bindings..."
+
+
+ --------------- IGNORING MODULES -------------------
+
+/home/daniel/Tools/ros2_arm64_dashing/src/ros2/demos/COLCON_IGNORE
+/home/daniel/Tools/ros2_arm64_dashing/src/ros2/rviz/COLCON_IGNORE
+/home/daniel/Tools/ros2_arm64_dashing/src/ros-visualization/COLCON_IGNORE

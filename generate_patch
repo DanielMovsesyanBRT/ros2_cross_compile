@@ -1,0 +1,32 @@
+#!/bin/bash
+
+CURDIR=$(pwd)
+GITLIST=$(find src/ -name .git)
+COLCONIGNORE=$(find src/ -name COLCON_IGNORE)
+
+
+for file in ${GITLIST}
+do
+  nowdir=$(dirname $file)
+  cd ${nowdir}
+  git diff --patch --src-prefix=${nowdir}/ --dst-prefix=${nowdir}/
+  cd ${CURDIR}
+done
+
+echo
+echo
+echo " --------------- IGNORING MODULES -------------------"
+echo
+for file in ${COLCONIGNORE}
+do
+  nowdir=$(dirname $file)
+  cd ${nowdir}
+  git ls-files --error-unmatch COLCON_IGNORE > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo $(pwd)"/COLCON_IGNORE"
+  fi
+
+  cd ${CURDIR}
+done
+
+
